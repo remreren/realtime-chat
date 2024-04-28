@@ -18,6 +18,5 @@ I set this project up for testing websocket + spring boot. This uses stomp for w
    - go to the root folder of the project
    - run `mvn spring-boot:run` or `./mvnw spring-boot:run`
 2. for serving the ui:
-3. for serving the ui:
    - go to the ui folder
    - run `python -m http.server 8000` or `npx http-server -p 8000`
