@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { useLoginStore } from "@/stores/loginStore.tsx";
 
 export function LoginPage() {
   return (
@@ -49,12 +50,11 @@ function LoginPageContent() {
   });
 
   const navigate = useNavigate();
+  const { login } = useLoginStore();
 
   const onSubmitForm = (data: z.infer<typeof FormSchema>) => {
-    localStorage.setItem("username", data.username);
-    setTimeout(() => navigate("/", {
-      replace: true
-    }), 40);
+    login(data.username);
+    navigate("/");
   };
 
   return (

@@ -1,10 +1,13 @@
 import { Room, RoomsListContainer } from "@/pages/Rooms.tsx";
+import { useLoginStore } from "@/stores/loginStore.tsx";
+import { Navigate } from "react-router-dom";
 
-type AppProps = {
-  username: string;
-};
+function App() {
+  const { username } = useLoginStore();
+  if (username === "") {
+    return <Navigate to={"/auth/login"} />;
+  }
 
-function App({ username }: AppProps) {
   const rooms: Room[] = [
     { id: 1, name: "Gaming" },
     { id: 2, name: "Programming" },

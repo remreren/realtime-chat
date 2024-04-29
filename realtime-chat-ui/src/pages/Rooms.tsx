@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card.tsx";
+import { useLoginStore } from "@/stores/loginStore.tsx";
 
 export function Rooms({ rooms, username }: RoomButtonListProps) {
   return (
@@ -32,6 +33,8 @@ export function RoomsListContainer({ rooms, username }: RoomButtonListProps) {
 }
 
 function RoomsList({ rooms, username }: RoomButtonListProps) {
+  const { logout } = useLoginStore();
+
   return (
     <>
       <CardHeader>
@@ -46,7 +49,9 @@ function RoomsList({ rooms, username }: RoomButtonListProps) {
         </div>
       </CardContent>
       <CardFooter>
-        Not {username}?<a href={"/auth/login"} className={"underline"}>Log in</a>
+        <div>
+          Not {username}?{" "}<a href={"/auth/login"} onClick={logout} className={"underline"}>Logout</a>
+        </div>
       </CardFooter>
     </>
   );
