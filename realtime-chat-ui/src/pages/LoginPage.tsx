@@ -13,7 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { useLoginStore } from "@/stores/loginStore.tsx";
+import { useLoginStore } from "@/stores/loginStore.ts";
 
 export function LoginPage() {
   return (

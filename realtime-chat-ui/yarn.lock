@@ -469,6 +469,17 @@
   dependencies:
     "@babel/runtime" "^7.13.10"
 
+"@radix-ui/react-avatar@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-avatar/-/react-avatar-1.0.4.tgz#de9a5349d9e3de7bbe990334c4d2011acbbb9623"
+  integrity sha512-kVK2K7ZD3wwj3qhle0ElXhOjbezIgyl2hVvgwfIdexL3rN6zJmy5AqqIf+D31lxVppdzV8CjAfZ6PklkmInZLw==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-context" "1.0.1"
+    "@radix-ui/react-primitive" "1.0.3"
+    "@radix-ui/react-use-callback-ref" "1.0.1"
+    "@radix-ui/react-use-layout-effect" "1.0.1"
+
 "@radix-ui/react-collection@1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-collection/-/react-collection-1.0.3.tgz#9595a66e09026187524a36c6e7e9c7d286469159"
@@ -554,6 +565,14 @@
     "@radix-ui/react-primitive" "1.0.3"
     "@radix-ui/react-use-callback-ref" "1.0.1"
     "@radix-ui/react-use-controllable-state" "1.0.1"
+
+"@radix-ui/react-separator@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-separator/-/react-separator-1.0.3.tgz#be5a931a543d5726336b112f465f58585c04c8aa"
+  integrity sha512-itYmTy/kokS21aiV5+Z56MZB54KrhPgn6eHDKkFeOLR34HMN2s8PaN47qZZAGnvupcjxHaFZnW4pQEh0BvvVuw==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-primitive" "1.0.3"
 
 "@radix-ui/react-slot@1.0.2", "@radix-ui/react-slot@^1.0.2":
   version "1.0.2"
@@ -684,6 +703,18 @@
   version "4.16.4"
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.16.4.tgz#c09ad9a132ccb5a67c4f211d909323ab1294f95f"
   integrity sha512-YunpoOAyGLDseanENHmbFvQSfVL5BxW3k7hhy0eN4rb3gS/ct75dVD0EXOWIqFT/nE8XYW6LP6vz6ctKRi0k9A==
+
+"@tanstack/react-virtual@^3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-virtual/-/react-virtual-3.5.0.tgz#873b5b77cf78af563a4a11e6251ed51ee8868132"
+  integrity sha512-rtvo7KwuIvqK9zb0VZ5IL7fiJAEnG+0EiFZz8FUOs+2mhGqdGmjKIaT1XU7Zq0eFqL0jonLlhbayJI/J2SA/Bw==
+  dependencies:
+    "@tanstack/virtual-core" "3.5.0"
+
+"@tanstack/virtual-core@3.5.0":
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/virtual-core/-/virtual-core-3.5.0.tgz#108208d0f1d75271300bc5560cf9a85a1fa01e89"
+  integrity sha512-KnPRCkQTyqhanNC0K63GBG3wA8I+D1fQuVnAvcBF8f13akOKeQp1gSbu6f77zCxhEk727iV5oQnbHLYzHrECLg==
 
 "@types/babel__core@^7.20.5":
   version "7.20.5"

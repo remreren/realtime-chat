@@ -2,8 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import "@/globals.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { LoginPage } from "@/pages/LoginPage.tsx";
+import { MessagePage } from "@/pages/MessagePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: "/auth/login",
     element: <LoginPage />
+  },
+  {
+    path: "/room/:id",
+    element: <MessagePage />
   }
 ]);
 
