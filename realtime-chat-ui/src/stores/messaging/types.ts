@@ -6,3 +6,8 @@ export type Message = {
   content: string;
   type: MessageType;
 };
+
+export type Message2 = {
+  content: string;
+  type: MessageType;
+};

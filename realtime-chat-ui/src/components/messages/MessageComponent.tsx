@@ -4,27 +4,68 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
-
-type MessageListProps = {
-  messages: Message[];
-};
+import { useMessagesStore } from "@/stores/messaging/messageStore.ts";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form.tsx";
 
 type MessageEntryProps = {
   message: Message;
 };
 
+const MessageForm = z.object({
+  message: z.string().min(1, {
+    message: "Username must be at least 1 characters."
+  })
+});
+
 export function MessageInput() {
+  const addMessage = useMessagesStore((state) => state.addMessage);
+
+  const form = useForm<z.infer<typeof MessageForm>>({
+    resolver: zodResolver(MessageForm),
+    defaultValues: {
+      message: ""
+    }
+  });
+
+  const onSubmitForm = (data: z.infer<typeof MessageForm>) => {
+    addMessage({ content: data.message, type: "message" });
+    form.reset({
+      message: ""
+    });
+  };
+
   return (
-    <div className={"flex flex-row gap-4"}>
-      <Input className={"flex-1"} placeholder={"Enter your message..."} />
-      <Button variant={"outline"} className={"p-2"}>
-        <ChevronRightIcon className={"w-6 h-6"} />
-      </Button>
+    <div className={"w-full"}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmitForm)} className={"flex w-full flex-row gap-4"} autoComplete={"off"}>
+          <FormField
+            control={form.control}
+            name={"message"}
+            render={({ field }) => (
+              <FormItem className={"flex-1"}>
+                <FormControl>
+                  <Input placeholder={"Enter your message..."}
+                         {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}>
+          </FormField>
+          <Button variant={"outline"} className={"p-2"} type={"submit"}>
+            <ChevronRightIcon className={"w-6 h-6"} />
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
 
-export function MessageList({ messages }: MessageListProps) {
+export function MessageList() {
+  const messages = useMessagesStore((state) => state.messages);
+
   return (
     <>
       {messages.map((message, idx) => (
