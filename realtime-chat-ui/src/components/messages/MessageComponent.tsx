@@ -13,6 +13,8 @@ import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { CompatClient, Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { LoaderIcon } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { useLoginStore } from "@/stores/loginStore.ts";
 
 type MessageEntryProps = {
   message: Message;
@@ -23,6 +25,9 @@ const MessageForm = z.object({
 });
 
 export function MessageInput() {
+  const params = useParams();
+  const username = useLoginStore((state) => state.username);
+
   const stompClient: MutableRefObject<CompatClient | null> = useRef(null);
   const addMessage = useMessagesStore((state) => state.addMessage);
   const [loading, setLoading] = useState(true);
@@ -39,16 +44,12 @@ export function MessageInput() {
     }
 
     stompClient.current.connect({}, () => {
-      console.log("Connected to STOMP server");
       setLoading(false);
-      stompClient.current?.subscribe("/topic/Gaming", (message) => {
+      stompClient.current?.subscribe(`/topic/${params.id}`, (message) => {
         console.log("Received", message.body);
-        addMessage({
-          content: JSON.parse(message.body).message,
-          type: "message"
-        });
+        addMessage(JSON.parse(message.body));
       });
-      stompClient.current?.send("/app/chat.register/Gaming", {}, JSON.stringify({ "sender": "remreren" }));
+      stompClient.current?.send(`/app/chat.register/${params.id}`, {}, JSON.stringify({ "sender": username }));
     });
 
     return () => {
@@ -66,8 +67,7 @@ export function MessageInput() {
   const onSubmitForm = (data: z.infer<typeof MessageForm>) => {
     if (!stompClient.current) return;
 
-    stompClient.current.send("/topic/Gaming", {}, JSON.stringify({ "message": data.message }));
-    addMessage({ content: data.message, type: "message" });
+    stompClient.current.send(`/app/chat.send/${params.id}`, {}, JSON.stringify({ content: data.message, sender: username }));
     form.reset({
       message: ""
     });
@@ -75,7 +75,7 @@ export function MessageInput() {
 
   return (loading ?
       (<div className={"w-full flex justify-center items-center"}>
-        <LoaderIcon className="animate-spin" />Connecting...
+        <LoaderIcon className="animate-spin mx-2" />Connecting...
       </div>) :
       (<div className={"w-full"}>
         <Form {...form}>
@@ -123,11 +123,11 @@ export function MessageEntry({ message }: MessageEntryProps) {
     <div className={"flex flex-row py-2"}>
       <div>
         <Avatar>
-          <AvatarFallback>{message.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+          <AvatarFallback>{message.sender?.slice(0, 2).toUpperCase() ?? "UN"}</AvatarFallback>
         </Avatar>
       </div>
       <div className={"flex-grow items-center px-4"}>
-        <h4 className={"font-bold"}>{message.username}</h4>
+        <h4 className={"font-bold"}>{message.sender}</h4>
         <div>{message.content}</div>
       </div>
     </div>

@@ -7,7 +7,7 @@ interface MessagesState {
 }
 
 interface MessagesActions {
-  addMessage: (message: Message2) => void;
+  addMessage: (message: Message2 & { sender: string }) => void;
 }
 
 type MessagesStore = MessagesState & MessagesActions;
@@ -15,12 +15,11 @@ type MessagesStore = MessagesState & MessagesActions;
 export const useMessagesStore = create<MessagesStore>()(
   immer((set) => ({
     messages: [],
-    addMessage: (message: Message2) => {
+    addMessage: (message: Message2 & { sender: string }) => {
       set((state) => {
         state.messages.unshift({
           id: `${state.messages.length + 1}`,
-          username: "remreren",
-          ...message,
+          ...message
         });
       });
     }
