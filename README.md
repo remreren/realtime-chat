@@ -24,3 +24,5 @@ I set this project up for testing websocket + spring boot. This uses stomp for w
 3. [ALTERNATIVE] for serving the legacy ui:
    - go to the ui folder
    - run `python -m http.server 8000` or `npx http-server -p 8000`
+
+change2
