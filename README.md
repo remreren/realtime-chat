@@ -5,7 +5,7 @@ I set this project up for testing websocket + spring boot. This uses stomp for w
 ## requirements
 1. java 21
 2. maven
-3. npm/yarn
+3. npm/yarn (or for legacy ui: node.js/python)
 
 ## run but how?
 1. clone and setup project
