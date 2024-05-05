@@ -38,6 +38,9 @@ function LoginPageContainer() {
 const FormSchema = z.object({
   username: z.string().min(2, {
     message: "Username must be at least 2 characters."
+  }),
+  password: z.string().min(4, {
+    message: "Password must be at least 4 characters."
   })
 });
 
@@ -45,7 +48,8 @@ function LoginPageContent() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      username: ""
+      username: "",
+      password: ""
     }
   });
 
@@ -53,7 +57,7 @@ function LoginPageContent() {
   const { login } = useLoginStore();
 
   const onSubmitForm = (data: z.infer<typeof FormSchema>) => {
-    login(data.username);
+    login(data.username, data.password);
     navigate("/");
   };
 
@@ -66,13 +70,29 @@ function LoginPageContent() {
       <CardContent>
         <div className={"w-full flex gap-4 flex-col"}>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmitForm)} className={"flex flex-col"}>
+            <form onSubmit={form.handleSubmit(onSubmitForm)} className={"flex flex-col gap-4"}>
               <FormField
                 control={form.control}
                 name={"username"}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        className={"flex-1"}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}>
+              </FormField>
+              <FormField
+                control={form.control}
+                name={"password"}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
                         className={"flex-1"}

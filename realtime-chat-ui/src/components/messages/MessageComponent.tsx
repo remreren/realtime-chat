@@ -24,18 +24,23 @@ const MessageForm = z.object({
   message: z.string().min(1, { message: "" })
 });
 
+const ConnectionState = {
+  CONNECTING: "Connecting...",
+  CONNECTED: "Connected",
+  CLOSING: "Closing...",
+  FAILED: "Failed to connect."
+};
+
 export function MessageInput() {
   const params = useParams();
-  const username = useLoginStore((state) => state.username);
+  const [username] = useLoginStore((state) => [state.username]);
 
   const stompClient: MutableRefObject<CompatClient | null> = useRef(null);
   const addMessage = useMessagesStore((state) => state.addMessage);
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState(ConnectionState.CONNECTING);
 
   useEffect(() => {
-    const sockJs = new SockJS("/ws", null, {
-      timeout: 5000
-    });
+    const sockJs = new SockJS("/ws");
 
     stompClient.current = Stomp.over(sockJs);
 
@@ -43,13 +48,18 @@ export function MessageInput() {
       return;
     }
 
+    stompClient.current.onWebSocketClose = () => {
+      setState(ConnectionState.FAILED);
+    };
+
     stompClient.current.connect({}, () => {
-      setLoading(false);
+      setState(ConnectionState.CONNECTED);
       stompClient.current?.subscribe(`/topic/${params.id}`, (message) => {
-        console.log("Received", message.body);
         addMessage(JSON.parse(message.body));
       });
       stompClient.current?.send(`/app/chat.register/${params.id}`, {}, JSON.stringify({ "sender": username }));
+    }, () => {
+      setState(ConnectionState.FAILED);
     });
 
     return () => {
@@ -67,40 +77,46 @@ export function MessageInput() {
   const onSubmitForm = (data: z.infer<typeof MessageForm>) => {
     if (!stompClient.current) return;
 
-    stompClient.current.send(`/app/chat.send/${params.id}`, {}, JSON.stringify({ content: data.message, sender: username }));
+    stompClient.current.send(`/app/chat.send/${params.id}`, {}, JSON.stringify({
+      content: data.message,
+      sender: username
+    }));
     form.reset({
       message: ""
     });
   };
 
-  return (loading ?
-      (<div className={"w-full flex justify-center items-center"}>
-        <LoaderIcon className="animate-spin mx-2" />Connecting...
-      </div>) :
-      (<div className={"w-full"}>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmitForm)} className={"flex w-full flex-row gap-4"}
-                autoComplete={"off"}>
-            <FormField
-              control={form.control}
-              name={"message"}
-              render={({ field }) => (
-                <FormItem className={"flex-1"}>
-                  <FormControl>
-                    <Input placeholder={"Enter your message..."}
-                           {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}>
-            </FormField>
-            <Button variant={"outline"} className={"p-2"} type={"submit"}>
-              <ChevronRightIcon className={"w-6 h-6"} />
-            </Button>
-          </form>
-        </Form>
-      </div>)
-  );
+  return (state === ConnectionState.CONNECTED) ?
+    ((<div className={"w-full"}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmitForm)} className={"flex w-full flex-row gap-4"}
+              autoComplete={"off"}>
+          <FormField
+            control={form.control}
+            name={"message"}
+            render={({ field }) => (
+              <FormItem className={"flex-1"}>
+                <FormControl>
+                  <Input placeholder={"Enter your message..."}
+                         {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}>
+          </FormField>
+          <Button variant={"outline"} className={"p-2"} type={"submit"}>
+            <ChevronRightIcon className={"w-6 h-6"} />
+          </Button>
+        </form>
+      </Form>
+    </div>)) : (
+      (state === ConnectionState.CONNECTING ?
+        (<div className={"w-full flex justify-center items-center"}>
+          <LoaderIcon className="animate-spin mx-2" />Connecting...
+        </div>) :
+        (<div className={"w-full flex justify-center items-center"}>
+          Failed to connect.
+        </div>)));
 }
 
 export function MessageList() {
