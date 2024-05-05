@@ -5,7 +5,7 @@ I set this project up for testing websocket + spring boot. This uses stomp for w
 ## requirements
 1. java 21
 2. maven
-3. node.js/python (for serving the ui)
+3. npm/yarn
 
 ## run but how?
 1. clone and setup project
@@ -18,5 +18,9 @@ I set this project up for testing websocket + spring boot. This uses stomp for w
    - go to the root folder of the project
    - run `mvn spring-boot:run` or `./mvnw spring-boot:run`
 2. for serving the ui:
+   - go to the `realtime-chat-ui`
+   - run `npm i` or `yarn` to install deps
+   - run using `npm run dev` or `yarn dev`
+3. [ALTERNATIVE] for serving the legacy ui:
    - go to the ui folder
    - run `python -m http.server 8000` or `npx http-server -p 8000`
