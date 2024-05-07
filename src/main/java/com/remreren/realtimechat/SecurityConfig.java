@@ -6,7 +6,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +20,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
             .formLogin(Customizer.withDefaults())
-            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated());
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll());
         return http.build();
     }
 
@@ -31,15 +30,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user1 = User.withUsername("user1")
-                                .password("pass")
-                                .build();
-
-        UserDetails user2 = User.withUsername("user2")
-                                .password("pass")
-                                .build();
-
-        return new InMemoryUserDetailsManager(user1, user2);
+    public UserDetailsService detailsService() {
+        return new InMemoryUserDetailsManager(User.withUsername("user1")
+                                                  .password("pass")
+                                                  .build(),
+                                              User.withUsername("user2")
+                                                  .password("pass")
+                                                  .build());
     }
 }

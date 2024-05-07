@@ -1,4 +1,4 @@
-import { Message } from "@/stores/messaging/types.ts";
+import { Message } from "@/stores/messaging/messageStore.interface.ts";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar.tsx";
 import { Separator } from "@/components/ui/separator.tsx";
 import { Input } from "@/components/ui/input.tsx";
@@ -9,12 +9,12 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form.tsx";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
-import { CompatClient, Stomp } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
+import { useCallback, useEffect } from "react";
 import { LoaderIcon } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useLoginStore } from "@/stores/loginStore.ts";
+import { useWSClientStore } from "@/stores/wsclient/wsclient.ts";
+import { ConnectionStatus } from "@/stores/wsclient/wsclient.interface.ts";
 
 type MessageEntryProps = {
   message: Message;
@@ -24,46 +24,47 @@ const MessageForm = z.object({
   message: z.string().min(1, { message: "" })
 });
 
-const ConnectionState = {
-  CONNECTING: "Connecting...",
-  CONNECTED: "Connected",
-  CLOSING: "Closing...",
-  FAILED: "Failed to connect."
-};
-
 export function MessageInput() {
   const params = useParams();
   const [username] = useLoginStore((state) => [state.username]);
-
-  const stompClient: MutableRefObject<CompatClient | null> = useRef(null);
   const addMessage = useMessagesStore((state) => state.addMessage);
-  const [state, setState] = useState(ConnectionState.CONNECTING);
+
+  const [client, connect, disconnect, connectionStatus] = useWSClientStore((state) => [state.client, state.connect, state.disconnect, state.connectionStatus]);
+
+  type sendMessageType = (message: string) => void;
+
+  const sendMessage = useCallback<sendMessageType>((message) => {
+    if (!client) return;
+
+    client.publish({
+      destination: `/app/chat.send/${params.id}`,
+      body: JSON.stringify({
+        sender: username,
+        content: message,
+        type: "CHAT"
+      }),
+      headers: {
+        username: username,
+        passcode: "pass"
+      }
+    });
+  }, [client, params.id, username]);
 
   useEffect(() => {
-    const sockJs = new SockJS("/ws");
+    if (!client || connectionStatus !== ConnectionStatus.CONNECTED) return;
 
-    stompClient.current = Stomp.over(sockJs);
-
-    if (!stompClient.current) {
-      return;
-    }
-
-    stompClient.current.onWebSocketClose = () => {
-      setState(ConnectionState.FAILED);
-    };
-
-    stompClient.current.connect({}, () => {
-      setState(ConnectionState.CONNECTED);
-      stompClient.current?.subscribe(`/topic/${params.id}`, (message) => {
-        addMessage(JSON.parse(message.body));
-      });
-      stompClient.current?.send(`/app/chat.register/${params.id}`, {}, JSON.stringify({ "sender": username }));
-    }, () => {
-      setState(ConnectionState.FAILED);
+    client.subscribe(`/topic/${params.id}`, (message) => {
+      addMessage(JSON.parse(message.body));
     });
+  }, [client, connectionStatus]);
+
+  useEffect(() => {
+    connect();
 
     return () => {
-      stompClient.current?.disconnect();
+      if (client) {
+        setTimeout(disconnect, 100);
+      }
     };
   }, []);
 
@@ -75,18 +76,13 @@ export function MessageInput() {
   });
 
   const onSubmitForm = (data: z.infer<typeof MessageForm>) => {
-    if (!stompClient.current) return;
-
-    stompClient.current.send(`/app/chat.send/${params.id}`, {}, JSON.stringify({
-      content: data.message,
-      sender: username
-    }));
+    sendMessage(data.message);
     form.reset({
       message: ""
     });
   };
 
-  return (state === ConnectionState.CONNECTED) ?
+  return (connectionStatus === ConnectionStatus.CONNECTED) ?
     ((<div className={"w-full"}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmitForm)} className={"flex w-full flex-row gap-4"}
@@ -110,7 +106,7 @@ export function MessageInput() {
         </form>
       </Form>
     </div>)) : (
-      (state === ConnectionState.CONNECTING ?
+      (connectionStatus === ConnectionStatus.CONNECTING ?
         (<div className={"w-full flex justify-center items-center"}>
           <LoaderIcon className="animate-spin mx-2" />Connecting...
         </div>) :

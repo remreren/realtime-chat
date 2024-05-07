@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { Message, Message2 } from "@/stores/messaging/types.ts";
+import { Message, Message2 } from "@/stores/messaging/messageStore.interface.ts";
 
 interface MessagesState {
   messages: Message[];

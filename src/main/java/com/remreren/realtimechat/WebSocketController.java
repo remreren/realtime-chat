@@ -9,25 +9,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
+
 @Controller
 public class WebSocketController {
 
-    @MessageMapping("/chat.register")
-    @SendTo("/topic/public")
-    public Message greeting(@Payload Message chatMessage, SimpMessageHeaderAccessor headerAccessor) {
-        headerAccessor.getSessionAttributes().put("username", chatMessage.sender());
-        return chatMessage;
-    }
-
-    @MessageMapping("/chat.send")
-    @SendTo("/topic/public")
-    public Message sendMessage(@Payload Message chatMessage) {
-        return chatMessage;
-    }
-
     @MessageMapping("/chat.send/{roomName}")
     @SendTo("/topic/{roomName}")
-    public Message sendMessageToRoom(@Payload Message chatMessage) {
+    public Message sendMessageToRoom(@Payload Message chatMessage, Principal principal, SimpMessageHeaderAccessor headerAccessor) {
         return chatMessage;
     }
 

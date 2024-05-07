@@ -11,15 +11,25 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '')
+      },
       "/ws": {
-        target: "http://localhost:8080"
+        target: "ws://localhost:8080",
+        changeOrigin: true,
+        ws: true,
+        rewrite: path => path.replace(/^\/ws/, '')
       },
       "/app": {
         target: "ws://localhost:8080",
+        changeOrigin: true,
         ws: true
       },
       "/topic": {
         target: "ws://localhost:8080",
+        changeOrigin: true,
         ws: true
       }
     }
