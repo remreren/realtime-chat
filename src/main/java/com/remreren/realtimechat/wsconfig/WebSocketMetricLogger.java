@@ -1,25 +1,21 @@
-package com.remreren.realtimechat;
+package com.remreren.realtimechat.wsconfig;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
-@EnableScheduling
 public class WebSocketMetricLogger implements ChannelInterceptor {
-    private static final Logger log = LoggerFactory.getLogger(WebSocketMetricLogger.class);
+
     private static final Set<String> connectedSessionIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Override
@@ -34,16 +30,13 @@ public class WebSocketMetricLogger implements ChannelInterceptor {
 
         if (command == StompCommand.CONNECT) {
             connectedSessionIds.add(sessionId);
+            log.info("New user connected: {}, Connected user count: {}", sessionId, connectedSessionIds.size());
         } else if (command == StompCommand.DISCONNECT) {
             connectedSessionIds.remove(sessionId);
+            log.info("User disconnected: {}, Connected user count: {}", sessionId, connectedSessionIds.size());
         }
 
         return message;
-    }
-
-    @Scheduled(fixedRate = 2, initialDelay = 0, timeUnit = TimeUnit.SECONDS)
-    public void logConnectedUsers() {
-        log.info("Connected users: " + connectedSessionIds.size());
     }
 }
 

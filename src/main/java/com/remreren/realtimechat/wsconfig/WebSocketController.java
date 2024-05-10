@@ -1,5 +1,6 @@
-package com.remreren.realtimechat;
+package com.remreren.realtimechat.wsconfig;
 
+import com.remreren.realtimechat.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -16,7 +17,7 @@ public class WebSocketController {
 
     @MessageMapping("/chat.send/{roomName}")
     @SendTo("/topic/{roomName}")
-    public Message sendMessageToRoom(@Payload Message chatMessage, Principal principal, SimpMessageHeaderAccessor headerAccessor) {
+    public Message sendMessageToRoom(@Payload Message chatMessage, Principal principal) {
         return chatMessage;
     }
 

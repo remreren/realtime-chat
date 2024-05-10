@@ -1,5 +1,6 @@
-package com.remreren.realtimechat;
+package com.remreren.realtimechat.wsconfig;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -7,9 +8,13 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final WebSocketAuthManager authManager;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -25,6 +30,6 @@ public class WebSocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new WebSocketMetricLogger());
+        registration.interceptors(authManager, new WebSocketMetricLogger());
     }
 }
