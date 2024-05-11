@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -37,13 +38,13 @@ public class WebSocketAuthManager implements ChannelInterceptor {
             User user = parseToken(token);
 
             if (Objects.isNull(user)) {
-                return null;
+                throw new AccessDeniedException("Invalid Authorization Token");
             }
 
             UserDetails test = detailsService.loadUserByUsername(user.getUsername());
 
             if (!user.getPassword().equals(test.getPassword())) {
-                return null;
+                throw new AccessDeniedException("Unauthorized");
             }
 
             Authentication auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(), List.of());

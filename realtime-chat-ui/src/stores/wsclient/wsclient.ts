@@ -51,8 +51,6 @@ function createClient(store: WSClientStore): Client {
 
   return new Client({
     connectHeaders: {
-      "username": "user1",
-      "passcode": "pass",
       "Authorization": "Basic dXNlcjI6cGFzcw=="
     },
     brokerURL: "ws://localhost:5173/ws/stomp",
